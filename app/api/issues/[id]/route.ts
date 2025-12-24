@@ -21,14 +21,17 @@ const authMiddleware = new AuthMiddleware(jwtUtil);
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         // Authenticate user
         const userId = authMiddleware.authenticate(request);
 
+        // Await params
+        const { id } = await params;
+
         // Get issue
-        return issueHandler.handleGetIssue(params.id, userId);
+        return issueHandler.handleGetIssue(id, userId);
     } catch (error: any) {
         return new Response(
             JSON.stringify({
@@ -48,14 +51,17 @@ export async function GET(
 
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         // Authenticate user
         const userId = authMiddleware.authenticate(request);
 
+        // Await params
+        const { id } = await params;
+
         // Update issue
-        return issueHandler.handleUpdateIssue(params.id, request, userId);
+        return issueHandler.handleUpdateIssue(id, request, userId);
     } catch (error: any) {
         return new Response(
             JSON.stringify({
@@ -75,14 +81,17 @@ export async function PUT(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         // Authenticate user
         const userId = authMiddleware.authenticate(request);
 
+        // Await params
+        const { id } = await params;
+
         // Delete issue
-        return issueHandler.handleDeleteIssue(params.id, userId);
+        return issueHandler.handleDeleteIssue(id, userId);
     } catch (error: any) {
         return new Response(
             JSON.stringify({

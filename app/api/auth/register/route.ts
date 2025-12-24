@@ -21,7 +21,7 @@ const rateLimiter = new RateLimiter(prisma);
 
 export async function POST(request: NextRequest) {
     // Apply rate limiting
-    const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
     const rateLimitResult = await rateLimiter.checkLimit(`register:${ip}`);
 
     if (!rateLimitResult.allowed) {

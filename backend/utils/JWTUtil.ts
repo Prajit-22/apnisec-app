@@ -23,7 +23,7 @@ export class JWTUtil {
     public sign(payload: Omit<JWTPayload, 'iat' | 'exp'>): string {
         return jwt.sign(payload, this.secret, {
             expiresIn: this.expiresIn,
-        });
+        } as jwt.SignOptions);
     }
 
     /**
