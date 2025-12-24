@@ -3,56 +3,68 @@ import { IEmailService } from './interfaces/IEmailService';
 import { IssueDTO } from '../types/dtos';
 
 export class EmailService implements IEmailService {
-    private readonly resend: Resend;
-    private readonly fromEmail: string = 'ApniSec <onboarding@resend.dev>';
+  private readonly resend: Resend | null;
+  private readonly fromEmail: string = 'ApniSec <onboarding@resend.dev>';
 
-    constructor() {
-        const apiKey = process.env.RESEND_API_KEY;
-        if (!apiKey) {
-            console.warn('RESEND_API_KEY not found. Email functionality will be disabled.');
-        }
-        this.resend = new Resend(apiKey);
+  constructor() {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      console.warn('RESEND_API_KEY not found. Email functionality will be disabled.');
+      this.resend = null;
+    } else {
+      this.resend = new Resend(apiKey);
+    }
+  }
+
+  /**
+   * Send welcome email to new user
+   */
+  public async sendWelcomeEmail(to: string, name: string): Promise<void> {
+    if (!this.resend) {
+      console.log('Email service disabled - skipping welcome email');
+      return;
     }
 
-    /**
-     * Send welcome email to new user
-     */
-    public async sendWelcomeEmail(to: string, name: string): Promise<void> {
-        try {
-            await this.resend.emails.send({
-                from: this.fromEmail,
-                to,
-                subject: 'Welcome to ApniSec - Your Cybersecurity Partner',
-                html: this.getWelcomeEmailTemplate(name),
-            });
-        } catch (error) {
-            console.error('Failed to send welcome email:', error);
-            // Don't throw error - email failure shouldn't block registration
-        }
+    try {
+      await this.resend.emails.send({
+        from: this.fromEmail,
+        to,
+        subject: 'Welcome to ApniSec - Your Cybersecurity Partner',
+        html: this.getWelcomeEmailTemplate(name),
+      });
+    } catch (error) {
+      console.error('Failed to send welcome email:', error);
+      // Don't throw error - email failure shouldn't block registration
+    }
+  }
+
+  /**
+   * Send issue created notification email
+   */
+  public async sendIssueCreatedEmail(to: string, issue: IssueDTO): Promise<void> {
+    if (!this.resend) {
+      console.log('Email service disabled - skipping issue created email');
+      return;
     }
 
-    /**
-     * Send issue created notification email
-     */
-    public async sendIssueCreatedEmail(to: string, issue: IssueDTO): Promise<void> {
-        try {
-            await this.resend.emails.send({
-                from: this.fromEmail,
-                to,
-                subject: `New Issue Created: ${issue.title}`,
-                html: this.getIssueCreatedEmailTemplate(issue),
-            });
-        } catch (error) {
-            console.error('Failed to send issue created email:', error);
-            // Don't throw error - email failure shouldn't block issue creation
-        }
+    try {
+      await this.resend.emails.send({
+        from: this.fromEmail,
+        to,
+        subject: `New Issue Created: ${issue.title}`,
+        html: this.getIssueCreatedEmailTemplate(issue),
+      });
+    } catch (error) {
+      console.error('Failed to send issue created email:', error);
+      // Don't throw error - email failure shouldn't block issue creation
     }
+  }
 
-    /**
-     * Get welcome email HTML template
-     */
-    private getWelcomeEmailTemplate(name: string): string {
-        return `
+  /**
+   * Get welcome email HTML template
+   */
+  private getWelcomeEmailTemplate(name: string): string {
+    return `
       <!DOCTYPE html>
       <html>
         <head>
@@ -116,13 +128,13 @@ export class EmailService implements IEmailService {
         </body>
       </html>
     `;
-    }
+  }
 
-    /**
-     * Get issue created email HTML template
-     */
-    private getIssueCreatedEmailTemplate(issue: IssueDTO): string {
-        return `
+  /**
+   * Get issue created email HTML template
+   */
+  private getIssueCreatedEmailTemplate(issue: IssueDTO): string {
+    return `
       <!DOCTYPE html>
       <html>
         <head>
@@ -211,5 +223,5 @@ export class EmailService implements IEmailService {
         </body>
       </html>
     `;
-    }
+  }
 }
