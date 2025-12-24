@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  issues    Issue[]
+  
+  @@index([email])
+}
+
+enum IssueType {
+  CLOUD_SECURITY
+  RED_TEAM
+  VAPT
+}
+
+enum IssueStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model Issue {
+  id          String       @id @default(cuid())
+  title       String
+  description String       @db.Text
+  type        IssueType
+  status      IssueStatus  @default(OPEN)
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+}
+
+model RateLimit {
+  id         String   @id @default(cuid())
+  identifier String
+  count      Int      @default(1)
+  resetAt    DateTime
+  createdAt  DateTime @default(now())
+  
+  @@unique([identifier, resetAt])
+  @@index([identifier])
+  @@index([resetAt])
+}
