@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { BaseError } from '../../errors';
+import { BaseError, ValidationError } from '../../errors';
 
 export abstract class BaseHandler {
     /**
@@ -58,7 +58,7 @@ export abstract class BaseHandler {
             return await request.json();
         } catch (error) {
             // Throw a proper error instead of silently returning empty object
-            throw new BaseError('Invalid JSON in request body. Please ensure the request body is valid JSON.', 400);
+            throw new ValidationError('Invalid JSON in request body. Please ensure the request body is valid JSON.');
         }
     }
 }
