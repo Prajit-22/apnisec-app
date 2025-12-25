@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+
 export const metadata: Metadata = {
     title: "ApniSec - Your Cybersecurity Partner",
     description: "Comprehensive cybersecurity solutions including Cloud Security, Red Team Assessment, and VAPT services.",
