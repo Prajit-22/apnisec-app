@@ -56,8 +56,9 @@ export abstract class BaseHandler {
     protected async getRequestBody(request: Request): Promise<any> {
         try {
             return await request.json();
-        } catch {
-            return {};
+        } catch (error) {
+            // Throw a proper error instead of silently returning empty object
+            throw new BaseError('Invalid JSON in request body. Please ensure the request body is valid JSON.', 400);
         }
     }
 }
